@@ -4,6 +4,8 @@ import { render, cleanup, waitForElement, fireEvent, getByText, prettyDOM, debug
 
 import Application from "components/Application";
 
+/**We also need to understand the appropriate use of imported queries vs queries that are returned by render function. We can import { getByText } from "@testing-library/react" or we can use const { getByText } = render(<Component />). The two functions differ even though they share a name. The second example already has a container and does not need to have one passed to it. */
+
 afterEach(cleanup);
 
 it("defaults to Monday and changes the schedule when a new day is selected", async () => {
@@ -34,6 +36,43 @@ it("loads data, books an interview and reduces the spots remaining for Monday by
 
   console.log(prettyDOM(appointment));
 });
+
+const day = getAllByTestId(container, "day").find(day =>
+  queryByText(day, "Monday")
+);
+
+console.log(prettyDOM(day));
+
+/* missed somethings time for bed. 
+
+it("loads data, books an interview and reduces the spots remaining for Monday by 1", async () => {
+  const { container, debug } = render(<Application />);
+
+  await waitForElement(() => getByText(container, "Archie Cohen"));
+
+  const appointments = getAllByTestId(container, "appointment");
+  const appointment = appointments[0];
+
+  fireEvent.click(getByAltText(appointment, "Add"));
+
+  fireEvent.change(getByPlaceholderText(appointment, /enter student name/i), {
+    target: { value: "Lydia Miller-Jones" }
+  });
+
+  fireEvent.click(getByAltText(appointment, "Sylvia Palmer"));
+  fireEvent.click(getByText(appointment, "Save"));
+
+  expect(getByText(appointment, "Saving")).toBeInTheDocument();
+
+  await waitForElement(() => getByText(appointment, "Lydia Miller-Jones"));
+
+  const day = getAllByTestId(container, "day").find(day =>
+    queryByText(day, "Monday")
+  );
+
+  expect(getByText(day, "no spots remaining")).toBeInTheDocument();
+});
+
 
 //my answer
 // it("loads data, books an interview and reduces the spots remaining for Monday by 1", async () => {
