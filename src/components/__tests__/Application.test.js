@@ -4,10 +4,12 @@ import { render, cleanup, waitForElement, fireEvent, getByText, prettyDOM, debug
 
 import Application from "components/Application";
 
+import axios from "axios";
+
 /**We also need to understand the appropriate use of imported queries vs queries that are returned by render function. We can import { getByText } from "@testing-library/react" or we can use const { getByText } = render(<Component />). The two functions differ even though they share a name. The second example already has a container and does not need to have one passed to it. */
 
 afterEach(cleanup);
-
+//test 1
 it("defaults to Monday and changes the schedule when a new day is selected", async () => {
   const { getByText } = render(<Application />);
 
@@ -17,6 +19,7 @@ it("defaults to Monday and changes the schedule when a new day is selected", asy
 });
 
 //compass answer
+//test 2
 it("loads data, cancels an interview and increases the spots remaining for Monday by 1", async () => {
   // 1. Render the Application.
   const { container } = render(<Application />);
@@ -62,6 +65,7 @@ it("loads data, cancels an interview and increases the spots remaining for Monda
   // });
 
 //compass answer 
+//test 3
 it("loads data, books an interview and reduces the spots remaining for Monday by 1", async () => {
   const { container } = render(<Application />);
 
@@ -88,6 +92,46 @@ const day = getAllByTestId(container, "day").find(day =>
 );
 
 console.log(prettyDOM(day));
+
+//test 4
+it("loads data, edits an interview and keeps the spots remaining for Monday the same", async() => {
+  // 1. Render the Application.
+  const { container } = render(<Application />);
+
+  // 2. Wait until the text "Archie Cohen" is displayed.
+  await waitForElement(() => getByText(container, "Archie Cohen"));
+
+  // 3. Click the "Delete" button on the booked appointment.
+  const appointment = getAllByTestId(container, "appointment").find(
+    appointment => queryByText(appointment, "Archie Cohen")
+  );
+
+  fireEvent.click(queryByAltText(appointment, "Edit"));   
+  fireEvent.click(queryByAltText(appointment, "Confirm"));
+
+    await waitForElement(() => queryByAltText(appointment, "Edit"));
+
+    const day = getAllByTestId(container, "day").find(day =>
+      queryByAltText(day, "Monday")
+    );
+    expect(queryByAltText(day, "1 spot remaining")).toBeInTheDocument();
+
+});
+
+//test 5 
+it("shows the save error when failing to save an appointment", () => {
+  axios.put.mockRejectedValueOnce();
+});
+
+//test 6
+it("shows the save error when failing to save an appointment", () => {
+  axios.put.mockRejectedValueOnce();
+});
+
+//test 7
+it("shows the delete error when failing to delete an existing appointment", () => {
+  axios.delete.mockRejectedValueOnce();
+})
 
 /* missed somethings time for bed. 
 
